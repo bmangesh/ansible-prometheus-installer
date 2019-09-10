@@ -1,0 +1,12 @@
+---
+- hosts: all
+  roles: 
+      - common
+     
+- hosts: prometheus
+  roles:
+      - prometheus 
+
+- hosts: prometheusExporter
+  roles:
+      - prometheus-nodeExporter           
