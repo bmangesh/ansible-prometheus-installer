@@ -1,7 +1,7 @@
-[prometheus]
-172.17.254.81
+#[prometheus]
 
 
-#[node_exporter]
+[node_exporter]
+172.17.254.28
 
 

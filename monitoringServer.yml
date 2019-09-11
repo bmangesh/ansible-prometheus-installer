@@ -9,6 +9,7 @@
       - prometheus 
   tags: prometheus    
 
-- hosts: prometheusExporter
+- hosts: node_exporter
   roles:
-      - prometheus-nodeExporter           
+      - prometheus-nodeExporter  
+  tags: nodeExporter          

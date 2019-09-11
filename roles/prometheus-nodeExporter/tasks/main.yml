@@ -1,0 +1,63 @@
+
+---
+- name: Copy Prometheus node_exporter tar file
+  copy:
+     src: node_exporter-{{ node_exp }}.linux-amd64.tar.gz
+     dest: /opt
+
+- name: Add the  prometheus node_exporter user      
+  user: 
+     name: nodeusr
+     shell: /bin/false
+     create_home: no  
+
+
+- name: Unarchive prometheus node_exporter artifacts
+  unarchive:
+    src:  /opt/node_exporter-{{ node_exp }}.linux-amd64.tar.gz
+    dest: /opt 
+    remote_src: yes
+    extra_opts:
+    - --transform
+    - s/^node_exporter-{{ node_exp }}.linux-amd64/node_exporter/ 
+    
+- name: Copy node_exporter  binary  to “/usr/local/bin”
+  copy: 
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    remote_src: yes
+    owner: nodeusr
+    group: nodeusr
+    mode: '0755'
+  with_items:
+    - /opt/node_exporter/node_exporter 
+
+- name: Configure the node_exporter systemd Service File. 
+  template:
+     src: node_exporter.service.j2
+     dest: /etc/systemd/system/node_exporter.service 
+       
+
+- name: just force systemd to reread configs
+  systemd:
+    daemon_reload: yes     
+  
+- name: start the prometheus node_exporter agent
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+- name: allow prometheus http port 9100 
+  firewalld:
+    port: 9100/tcp
+    permanent: yes
+    state: enabled  
+    
+- name: restart Firewalld service
+  service:
+    name: firewalld
+    state: restarted
+
+    
+    
