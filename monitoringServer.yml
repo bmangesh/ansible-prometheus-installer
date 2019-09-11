@@ -2,10 +2,12 @@
 - hosts: all
   roles: 
       - common
+  tags: common    
      
 - hosts: prometheus
   roles:
       - prometheus 
+  tags: prometheus    
 
 - hosts: prometheusExporter
   roles:

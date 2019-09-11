@@ -1,0 +1,85 @@
+
+---
+- name: Copy Prometheus tar file
+  copy:
+     src: prometheus-{{ prom_ver }}.linux-amd64.tar.gz
+     dest: /opt
+
+- name: Add the  prometheus user      
+  user: 
+     name: prometheus
+     shell: /bin/false
+     create_home: no  
+
+- name: create dir for prometheus
+  file:
+    path: "{{ item }}"
+    state: directory  
+    owner: prometheus
+    group: prometheus  
+  with_items:
+    - /etc/prometheus
+    - /var/lib/prometheus    
+
+- name: Unarchive prometheus artifacts
+  unarchive:
+    src:  /opt/prometheus-{{ prom_ver }}.linux-amd64.tar.gz
+    dest: /opt 
+    remote_src: yes
+    extra_opts:
+    - --transform
+    - s/^prometheus-{{ prom_ver }}.linux-amd64/prometheus/ 
+    
+- name: Copy “prometheus” and “promtool” binary from the “prometheus” dir to “/usr/local/bin”
+  copy: 
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    remote_src: yes
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  with_items:
+    - /opt/prometheus/prometheus 
+    - /opt/prometheus/promtool 
+
+- name: Copy “consoles” and “console_libraries” directories from the “prometheus” to “/etc/prometheus dir”    
+  shell: cp -r /opt/prometheus/consoles /etc/prometheus;cp -r /opt/prometheus/console_libraries /etc/prometheus
+
+- name: Change the ownership to Prometheus user
+  shell: chown -R prometheus:prometheus /etc/prometheus/consoles;chown -R prometheus:prometheus /etc/prometheus/console_libraries
+  
+- name: copy Prometheus template configuration file.  
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    owner: prometheus
+    group: prometheus
+
+- name: Configure the Prometheus systemd Service File. 
+  template:
+     src: prometheus.service.j2
+     dest: /etc/systemd/system/prometheus.service   
+
+- name: just force systemd to reread configs
+  systemd:
+    daemon_reload: yes     
+  
+- name: start the prometheus server
+  systemd:
+    name: prometheus
+    state: started
+    enabled: yes
+
+- name: allow prometheus http port 9090 
+  firewalld:
+    port: 9090/tcp
+    permanent: yes
+    state: enabled  
+    
+- name: restart Firewalld service
+  service:
+    name: firewalld
+    state: restarted
+
+    
+    
