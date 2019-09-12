@@ -1,9 +1,9 @@
 
 ---
-- name: Copy Prometheus tar file
+- name: Copy Prometheus {{ prometheus_version }}  tar file to remote server
   copy:
-     src: "prometheus-{{ prom_ver }}.linux-amd64.tar.gz"
-     dest: "{{ ins_dir }}"
+     src: "prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+     dest: "{{ prometheus_installtion_dir }}"
 
 - name: Add the  prometheus user      
   user: 
@@ -23,12 +23,12 @@
 
 - name: Unarchive prometheus artifacts
   unarchive:
-    src:  "{{ ins_dir }}/prometheus-{{ prom_ver }}.linux-amd64.tar.gz"
-    dest: "{{ ins_dir }}" 
+    src:  "{{ prometheus_installtion_dir }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_installtion_dir }}" 
     remote_src: yes
     extra_opts:
     - --transform
-    - s/^prometheus-{{ prom_ver }}.linux-amd64/prometheus/ 
+    - s/^prometheus-{{ prometheus_version }}.linux-amd64/prometheus/ 
     
 - name: Copy “prometheus” and “promtool” binary from the “prometheus” dir to “/usr/local/bin”
   copy: 
@@ -39,11 +39,11 @@
     group: prometheus
     mode: '0755'
   with_items:
-    - "{{ ins_dir }}/prometheus/prometheus" 
-    - "{{ ins_dir }}/prometheus/promtool" 
+    - "{{ prometheus_installtion_dir }}/prometheus/prometheus" 
+    - "{{ prometheus_installtion_dir }}/prometheus/promtool" 
 
 - name: Copy “consoles” and “console_libraries” directories from the “prometheus” to “/etc/prometheus dir”    
-  shell: cp -r {{ ins_dir }}/prometheus/consoles /etc/prometheus;cp -r {{ ins_dir }}/prometheus/console_libraries /etc/prometheus
+  shell: cp -r {{ prometheus_installtion_dir }}/prometheus/consoles /etc/prometheus;cp -r {{ prometheus_installtion_dir }}/prometheus/console_libraries /etc/prometheus
 
 - name: Change the ownership to Prometheus user
   shell: chown -R prometheus:prometheus /etc/prometheus/consoles;chown -R prometheus:prometheus /etc/prometheus/console_libraries

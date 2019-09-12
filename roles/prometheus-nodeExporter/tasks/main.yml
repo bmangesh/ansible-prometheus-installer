@@ -1,9 +1,8 @@
-
 ---
 - name: Copy Prometheus node_exporter tar file
   copy:
-     src: "node_exporter-{{ node_exp }}.linux-amd64.tar.gz"
-     dest: "{{ ins_dir }}"
+     src: "node_exporter-{{ nodexporter_version }}.linux-amd64.tar.gz"
+     dest: "{{ prometheus_installtion_dir }}"
 
 - name: Add the  prometheus node_exporter user      
   user: 
@@ -14,12 +13,12 @@
 
 - name: Unarchive prometheus node_exporter artifacts
   unarchive:
-    src:  "{{ ins_dir }}/node_exporter-{{ node_exp }}.linux-amd64.tar.gz"
-    dest: "{{ ins_dir }}" 
+    src:  "{{ prometheus_installtion_dir }}/node_exporter-{{ nodexporter_version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_installtion_dir }}" 
     remote_src: yes
     extra_opts:
     - --transform
-    - s/^node_exporter-{{ node_exp }}.linux-amd64/node_exporter/ 
+    - s/^node_exporter-{{ nodexporter_version }}.linux-amd64/node_exporter/ 
     
 - name: Copy node_exporter  binary  to “/usr/local/bin”
   copy: 
@@ -30,7 +29,7 @@
     group: nodeusr
     mode: '0755'
   with_items:
-    - "{{ ins_dir }}/node_exporter/node_exporter" 
+    - "{{ prometheus_installtion_dir }}/node_exporter/node_exporter" 
 
 - name: Configure the node_exporter systemd Service File. 
   template:
@@ -58,6 +57,3 @@
   service:
     name: firewalld
     state: restarted
-
-    
-    
