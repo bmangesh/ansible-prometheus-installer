@@ -3,7 +3,7 @@
 - name: Copy Prometheus tar file
   copy:
      src: prometheus-{{ prom_ver }}.linux-amd64.tar.gz
-     dest: /opt
+     dest: {{ ins_dir }}
 
 - name: Add the  prometheus user      
   user: 
@@ -23,8 +23,8 @@
 
 - name: Unarchive prometheus artifacts
   unarchive:
-    src:  /opt/prometheus-{{ prom_ver }}.linux-amd64.tar.gz
-    dest: /opt 
+    src:  {{ ins_dir }}/prometheus-{{ prom_ver }}.linux-amd64.tar.gz
+    dest: {{ ins_dir }} 
     remote_src: yes
     extra_opts:
     - --transform
@@ -39,11 +39,11 @@
     group: prometheus
     mode: '0755'
   with_items:
-    - /opt/prometheus/prometheus 
-    - /opt/prometheus/promtool 
+    - {{ ins_dir }}/prometheus/prometheus 
+    - {{ ins_dir }}/prometheus/promtool 
 
 - name: Copy “consoles” and “console_libraries” directories from the “prometheus” to “/etc/prometheus dir”    
-  shell: cp -r /opt/prometheus/consoles /etc/prometheus;cp -r /opt/prometheus/console_libraries /etc/prometheus
+  shell: cp -r {{ ins_dir }}/prometheus/consoles /etc/prometheus;cp -r {{ ins_dir }}/prometheus/console_libraries /etc/prometheus
 
 - name: Change the ownership to Prometheus user
   shell: chown -R prometheus:prometheus /etc/prometheus/consoles;chown -R prometheus:prometheus /etc/prometheus/console_libraries
