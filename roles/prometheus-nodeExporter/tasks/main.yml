@@ -2,8 +2,8 @@
 ---
 - name: Copy Prometheus node_exporter tar file
   copy:
-     src: node_exporter-{{ node_exp }}.linux-amd64.tar.gz
-     dest: {{ ins_dir }}
+     src: "node_exporter-{{ node_exp }}.linux-amd64.tar.gz"
+     dest: "{{ ins_dir }}"
 
 - name: Add the  prometheus node_exporter user      
   user: 
@@ -14,8 +14,8 @@
 
 - name: Unarchive prometheus node_exporter artifacts
   unarchive:
-    src:  {{ ins_dir }}/node_exporter-{{ node_exp }}.linux-amd64.tar.gz
-    dest: {{ ins_dir }} 
+    src:  "{{ ins_dir }}/node_exporter-{{ node_exp }}.linux-amd64.tar.gz"
+    dest: "{{ ins_dir }}" 
     remote_src: yes
     extra_opts:
     - --transform
@@ -30,7 +30,7 @@
     group: nodeusr
     mode: '0755'
   with_items:
-    - {{ ins_dir }}/node_exporter/node_exporter 
+    - "{{ ins_dir }}/node_exporter/node_exporter" 
 
 - name: Configure the node_exporter systemd Service File. 
   template:
