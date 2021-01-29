@@ -52,7 +52,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
  
  ```
     ansible-playbook -i hosts monitoringServer.yml --tags=prometheus
-    ansible-playbook -i hosts monitoringServer.yml --tags=prometheus-nodeExporter
+    ansible-playbook -i hosts monitoringServer.yml --tags=nodeExporter
  ```   
  
  5. Update the host file 
